@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Praniksha — A Story in Five Pages</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500&family=Parisienne&display=swap');
+
+:root{
+ --night:#050914;--night2:#0d1a30;--cream:#d071d2;--ink:#1c2940;
+ --gold:#d4af69;--gold2:#eed7a2;--rose:#9c5361;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:Inter,sans-serif;background:var(--night);color:var(--cream)}
+button{font:inherit}
+
+#progress{position:fixed;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,.08);z-index:100}
+#progress i{display:block;height:100%;width:20%;background:linear-gradient(90deg,var(--gold),#fff0bd);transition:width 1s}
+
+#music{
+ position:fixed;right:22px;bottom:20px;z-index:110;width:50px;height:50px;border-radius:50%;
+ border:1px solid rgba(238,215,162,.65);background:rgba(5,9,20,.68);color:var(--gold2);
+ backdrop-filter:blur(12px);cursor:pointer;box-shadow:0 12px 35px #0007
+}
+#music .bar{display:inline-block;width:3px;height:11px;background:currentColor;margin:0 1px;border-radius:3px;animation:eq .7s infinite alternate}
+#music .bar:nth-child(2){height:18px;animation-delay:.15s}.bar:nth-child(3){height:8px;animation-delay:.3s}
+#music.muted .bar{height:2px;animation:none}
+@keyframes eq{to{transform:scaleY(.3)}}
+
+#stage{width:100%;height:100%;perspective:1800px;position:relative}
+.page{
+ position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
+ opacity:0;visibility:hidden;transform:rotateY(18deg) translateX(5%) scale(.97);
+ transform-origin:100% 50%;
+ transition:
+   opacity .7s ease,
+   transform 1.15s cubic-bezier(.16,.8,.2,1),
+   visibility 1.15s;
+}
+.page::-webkit-scrollbar{display:none}
+.page.active{opacity:1;visibility:visible;transform:rotateY(0) translateX(0) scale(1);z-index:5}
+.page.leave{opacity:0;transform:rotateY(-24deg) translateX(-5%) scale(.97);z-index:4}
+
+#transition{
+ position:fixed;inset:0;z-index:200;pointer-events:none;display:grid;place-items:center;
+ opacity:0;background:radial-gradient(circle,#192a46 0%,#070d1c 42%,#02050b 100%);
+ transition:opacity .25s ease
+}
+#transition.show{opacity:1}
+#transition .chapter-pop{
+ text-align:center;transform:translateY(18px) scale(.9);opacity:0;
+ transition:all .65s .12s cubic-bezier(.2,.8,.2,1)
+}
+#transition.show .chapter-pop{transform:none;opacity:1}
+#transition .small{font:10px Inter,sans-serif;letter-spacing:.4em;text-transform:uppercase;color:var(--gold2)}
+#transition .big{font:500 clamp(48px,8vw,100px) "Cormorant Garamond",serif;margin-top:12px}
+#transition .line{height:1px;width:90px;background:var(--gold);margin:20px auto}
+#transition .star{font-size:24px;color:var(--gold2);animation:twinkle .7s infinite alternate}
+@keyframes twinkle{to{transform:scale(1.4);opacity:.5}}
+
+.stars{
+ position:absolute;inset:0;pointer-events:none;opacity:.4;
+ background-image:radial-gradient(#fff 1px,transparent 1px),radial-gradient(#e7cc8f 1px,transparent 1px);
+ background-size:135px 135px,240px 240px;animation:stars 38s linear infinite
+}
+@keyframes stars{to{background-position:270px 130px,-220px 190px}}
+.spark{
+ position:absolute;width:4px;height:4px;border-radius:50%;background:var(--gold2);
+ box-shadow:0 0 18px var(--gold2);pointer-events:none;opacity:0;
+ animation:spark 7s linear infinite
+}
+@keyframes spark{0%{transform:translateY(20vh) scale(.3);opacity:0}20%{opacity:.7}85%{opacity:.35}100%{transform:translateY(-105vh) scale(1.1);opacity:0}}
+
+.script{font-family:Parisienne,cursive}
+.gold{color:#bd9450}.eyebrow{font:10px Inter,sans-serif;letter-spacing:.35em;text-transform:uppercase;color:var(--gold2)}
+
+.entrance{
+ display:grid;place-items:center;text-align:center;
+ background:
+ radial-gradient(circle at 50% 30%,rgba(223,190,116,.17),transparent 27%),
+ linear-gradient(180deg,rgba(2,6,14,.05),rgba(2,6,14,.88)),
+ url("assets/portrait_01.jpg") center/cover
+}
+.entrance:after{content:"";position:absolute;inset:50% 0 0;background:linear-gradient(transparent,#02060d)}
+.hero{position:relative;z-index:2;padding:35px;max-width:1000px}
+.hero h1{font:500 clamp(76px,13vw,160px)/.75 "Cormorant Garamond",serif;margin:25px 0 30px}
+.hero p{font:26px "Cormorant Garamond",serif;line-height:1.4;max-width:720px;margin:auto}
+.ring{position:absolute;width:410px;height:410px;border:1px solid #ead39d26;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);animation:spin 26s linear infinite}
+.ring:before,.ring:after{content:"✦";position:absolute;color:var(--gold2);font-size:18px}.ring:before{top:-11px;left:50%}.ring:after{bottom:-11px;right:50%}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.portal{
+ margin:42px auto 0;width:94px;height:94px;border-radius:50%;
+ border:1px solid #ead39d99;display:grid;place-items:center;color:var(--gold2);
+ background:#07101f88;backdrop-filter:blur(8px);cursor:pointer;
+ box-shadow:0 0 0 0 #d9b66c44,0 0 40px #d9b66c18;animation:pulse 2.2s infinite
+}
+.portal span{font-size:27px}
+@keyframes pulse{50%{box-shadow:0 0 0 16px #d9b66c00,0 0 55px #d9b66c38}}
+.hint{margin-top:14px;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:#d9cba8}
+
+.paper{background:var(--cream);color:var(--ink);padding:9vh 7vw 11vh}
+.inner{max-width:1120px;margin:auto}
+.chapter-no{font:10px Inter,sans-serif;letter-spacing:.32em;text-transform:uppercase;color:#8b7045}
+.title{font:500 clamp(58px,8vw,108px)/.83 "Cormorant Garamond",serif;margin:18px 0 25px;color:#26354c}
+.lead{font:25px "Cormorant Garamond",serif;line-height:1.48;max-width:850px;color:#465166}
+.rule{width:90px;height:1px;background:#c9a867;margin:30px 0}
+.gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:15px;margin-top:48px}
+.photo{margin:0;position:relative;overflow:hidden;border-radius:2px;background:#d8cdb9}
+.photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.photo:hover img{transform:scale(1.055)}
+.a{grid-column:span 7;height:560px}.b{grid-column:span 5;height:410px}.c{grid-column:span 5;height:410px}.d{grid-column:span 7;height:500px}
+
+/* Chapter II memory gallery: show the photographs cleanly instead of forcing them
+   into fixed/cropped boxes. */
+.chapter2-gallery{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px;align-items:start}
+.chapter2-gallery .memory-photo{
+  margin:0;background:#fff;border:1px solid #26354c18;
+  box-shadow:0 18px 45px #1d294012;padding:10px;
+}
+.chapter2-gallery .memory-photo img{
+  display:block;width:100%;height:auto;max-height:68vh;
+  object-fit:contain;background:#e8dfce;
+}
+.chapter2-gallery .memory-caption{
+  padding:16px 12px 10px;color:#26354c;
+}
+.chapter2-gallery .memory-caption strong{
+  display:block;font:500 29px "Cormorant Garamond",serif;margin-bottom:5px;
+}
+.chapter2-gallery .memory-caption span{
+  display:block;font:13px/1.5 Inter,sans-serif;color:#697285;
+}
+.caption{position:absolute;left:18px;bottom:18px;color:#fff;font:25px "Cormorant Garamond",serif;text-shadow:0 3px 18px #000}
+.card-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:45px}
+.mini{
+ padding:28px;border:1px solid #24324a24;background:#fff8;min-height:170px;
+ transition:.35s;cursor:default
+}
+.mini:hover{transform:translateY(-6px);box-shadow:0 18px 40px #1d294014}
+.mini .icon{font-size:25px;color:#bd9450}.mini h3{font:500 29px "Cormorant Garamond",serif;margin:10px 0 6px}.mini p{font:15px/1.6 Inter,sans-serif;color:#596477;margin:0}
+
+
+/* Chapter II — memory atlas */
+.adventure-intro{
+ display:grid;grid-template-columns:1.15fr .85fr;gap:42px;align-items:end;margin-top:45px
+}
+.adventure-quote{
+ font:500 clamp(32px,4vw,55px)/1.02 "Cormorant Garamond",serif;color:#26354c;
+ border-left:2px solid #c9a867;padding-left:24px
+}
+.adventure-quote span{color:#bd9450}
+.adventure-note{font:15px/1.7 Inter,sans-serif;color:#687287;max-width:420px}
+.adventure-grid{
+ display:grid;grid-template-columns:1.35fr .65fr;grid-template-rows:330px 330px;
+ gap:16px;margin-top:45px
+}
+.adventure-photo{
+ position:relative;overflow:hidden;border-radius:3px;background:#d8cdb9
+}
+.adventure-photo.hero-photo{grid-row:1 / span 2}
+.adventure-photo img{width:100%;height:100%;display:block;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
+.adventure-photo:hover img{transform:scale(1.055)}
+.adventure-photo:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#0008)}
+.adventure-photo figcaption{position:absolute;z-index:2;left:22px;right:18px;bottom:19px;color:#fff}
+.adventure-photo .number{font:10px Inter,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#ead39e}
+.adventure-photo .caption-title{font:31px/1 "Cormorant Garamond",serif;margin-top:7px}
+.memory-row{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:42px
+}
+.memory{
+ padding:24px 24px 27px;background:#eee4cf;border-top:2px solid #c9a867;
+ transition:transform .35s,box-shadow .35s
+}
+.memory:hover{transform:translateY(-5px);box-shadow:0 16px 32px #1d294018}
+.memory .micon{font-size:19px;color:#bd9450}
+.memory h3{font:500 27px "Cormorant Garamond",serif;margin:9px 0 6px}
+.memory p{font:14px/1.65 Inter,sans-serif;color:#5d687b;margin:0}
+@media(max-width:720px){
+ .adventure-intro{grid-template-columns:1fr;gap:22px}
+ .adventure-grid{display:block}
+ .adventure-photo{height:390px!important;margin-bottom:14px}
+ .memory-row{grid-template-columns:1fr}
+}
+.nav{
+ position:relative;z-index:20;display:flex;gap:10px;justify-content:center;align-items:center;
+ width:max-content;max-width:100%;margin:55px auto 5px
+}
+.nav button{
+ border:1px solid #ead3a266;background:#07101fd9;color:var(--gold2);
+ border-radius:999px;padding:12px 18px;cursor:pointer;backdrop-filter:blur(9px);
+ font:10px Inter,sans-serif;letter-spacing:.15em;text-transform:uppercase;white-space:nowrap
+}
+.paper .nav button{background:#fff;color:#725b37;border-color:#725b3738}
+
+.letter-page{
+ background:radial-gradient(circle at 50% 10%,#d7b66d1d,transparent 27%),linear-gradient(#0b172b,#040913);
+ color:var(--cream);padding:8vh 5vw 11vh
+}
+.letter-wrap{max-width:840px;margin:auto}
+.envelope{
+ margin-top:28px;background:#f4e8d0;color:#26334a;padding:clamp(35px,6vw,75px);
+ position:relative;box-shadow:0 35px 100px #0008
+}
+.envelope:before{content:"";position:absolute;inset:15px;border:1px solid #785b2f47}
+.seal{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;margin:0 auto 28px;background:#9a3440;color:#f3dca4;font-size:25px;box-shadow:0 9px 25px #0004}
+.letter-title{text-align:center;font:10px Inter,sans-serif;letter-spacing:.23em;text-transform:uppercase;color:#795e39}
+.letter{font:24px/1.62 "Cormorant Garamond",serif;margin-top:30px}.letter p{margin:0 0 18px}
+.signature{font:42px Parisienne,cursive;text-align:right;color:#7b5b34;margin-top:25px}
+
+.final{
+ display:grid;place-items:center;text-align:center;padding:70px 7vw;
+ background:radial-gradient(circle at 50% 25%,#d6b66a2b,transparent 24%),linear-gradient(#07101f,#02050b)
+}
+.final-content{max-width:900px;position:relative;z-index:2}
+.twenty{font:500 clamp(150px,25vw,285px)/.68 "Cormorant Garamond",serif;color:var(--gold2);text-shadow:0 0 60px #ead39d24}
+.final h2{font:500 clamp(55px,8vw,100px)/.9 "Cormorant Garamond",serif;margin:35px 0 24px}
+.final p{font:25px/1.5 "Cormorant Garamond",serif;color:#e8dcc3;max-width:780px;margin:auto}
+.final .promise{
+ margin:45px auto 0;max-width:780px;padding:28px 32px;border:1px solid #ead39d42;
+ background:#ffffff08
+}
+.final .promise strong{color:var(--gold2)}
+.final .nav{margin-top:40px}
+
+@media(max-width:720px){
+ .paper{padding:65px 5% 95px}.gallery{display:block}.photo{height:410px!important;margin-bottom:14px}
+ .chapter2-gallery{grid-template-columns:1fr;gap:18px}
+ .chapter2-gallery .memory-photo{padding:8px}
+ .chapter2-gallery .memory-photo img{max-height:none}
+ .card-strip{grid-template-columns:1fr}.hero h1{font-size:76px}.hero p{font-size:22px}
+ .ring{width:285px;height:285px}.letter-page{padding:60px 5% 95px}
+ .letter{font-size:22px}.nav{margin-top:34px;flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div id="progress"><i></i></div>
+<button id="music" class="muted" aria-label="Unmute music" title="Unmute music">
+ <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+</button>
+<audio id="bg" loop preload="auto"><source src="assets/birthday.mp3" type="audio/mpeg"></audio>
+
+<div id="transition">
+ <div class="chapter-pop"><div class="star">✦</div><div class="small" id="transSmall">Chapter</div><div class="big" id="transBig">Once upon a time</div><div class="line"></div></div>
+</div>
+
+<main id="stage">
+
+<!-- PAGE 1 -->
+<section class="page active entrance" data-name="The Beginning">
+ <div class="stars"></div><div class="ring"></div>
+ <div class="hero">
+  <div class="eyebrow">A private little kingdom · made for Praniksha</div>
+  <h1>The Tale<br><span class="script" style="color:#e4c987">of Praniksha</span></h1>
+  <p>Not every story needs a castle. Sometimes, it only needs a person whose presence makes another person's world feel a little more like home.</p>
+  <button class="portal" data-next aria-label="Open the story"><span>✦</span></button>
+  <div class="hint">Touch the star to enter</div>
+ </div>
+</section>
+
+<!-- PAGE 2 -->
+<section class="page paper" data-name="The Years">
+ <div class="inner">
+  <div class="chapter-no">Chapter I · The Years Between</div>
+  <h2 class="title">She grew.<br>She wandered.<br><span class="gold">She became herself.</span></h2>
+  <div class="rule"></div>
+  <p class="lead">The photographs don't tell every story. They only leave little windows open — a smile here, a road there, a quiet moment, another version of the same girl. And somehow, all those little moments became <em>Praniksha</em>.</p>
+  <div class="adventure-intro">
+   <div class="adventure-quote">The years weren't just passing.<br><span>She was collecting a life.</span></div>
+   <div class="adventure-note">New places. New roads. New versions of herself. These aren't just photographs — they're little pieces of the person she was becoming.</div>
+  </div>
+
+  <div class="adventure-grid">
+   <figure class="adventure-photo hero-photo">
+    <img src="assets/portrait_05.jpg">
+    <figcaption><div class="number">01 · Somewhere new</div><div class="caption-title">She found places worth remembering.</div></figcaption>
+   </figure>
+   <figure class="adventure-photo">
+    <img src="assets/portrait_07.jpg">
+    <figcaption><div class="number">02 · The open road</div><div class="caption-title">She kept moving.</div></figcaption>
+   </figure>
+   <figure class="adventure-photo">
+    <img src="assets/portrait_08.jpg">
+    <figcaption><div class="number">03 · Becoming</div><div class="caption-title">And kept becoming herself.</div></figcaption>
+   </figure>
+  </div>
+
+  <div class="memory-row">
+   <div class="memory"><div class="micon">✦</div><h3>Places</h3><p>Everywhere she went became another little piece of the story.</p></div>
+   <div class="memory"><div class="micon">↗</div><h3>Adventures</h3><p>Some memories are quiet. Others arrive with a road, a bike, and somewhere to go.</p></div>
+   <div class="memory"><div class="micon">∞</div><h3>Twenty</h3><p>This isn't the end of growing up. It's the beginning of choosing the life she wants.</p></div>
+  </div>
+  <div class="card-strip">
+   <div class="mini"><div class="icon">✦</div><h3>The little moments</h3><p>The ordinary days are often the ones we remember longest.</p></div>
+   <div class="mini"><div class="icon">◌</div><h3>The changing girl</h3><p>Different places, different seasons — still unmistakably her.</p></div>
+   <div class="mini"><div class="icon">∞</div><h3>The story continues</h3><p>Twenty is not an ending. It is the first page of another volume.</p></div>
+  </div>
+  <div class="nav"><button data-prev>← Back</button><button data-next>Open the next chapter ✦</button></div>
+ </div>
+</section>
+
+<!-- PAGE 3 -->
+<section class="page paper" data-name="What She Means">
+ <div class="inner">
+  <div class="chapter-no">Chapter II · The Part I Never Say Enough</div>
+  <h2 class="title">Some people<br>are loved.<br><span class="gold">Some are felt.</span></h2>
+  <div class="rule"></div>
+  <p class="lead">Praniksha, there are things that are difficult to put into a birthday wish. Like how someone's presence can quietly become part of the rhythm of your life — until you notice how different the room feels when they aren't there.</p>
+
+  <div class="chapter2-gallery">
+   <figure class="memory-photo">
+    <img src="assets/portrait_05.jpg" alt="Praniksha">
+    <figcaption class="memory-caption">
+      <strong>Your presence has a way of staying.</strong>
+      <span>Some photographs hold a moment. Some somehow hold a feeling.</span>
+    </figcaption>
+   </figure>
+   <figure class="memory-photo">
+    <img src="assets/portrait_06.jpg" alt="Praniksha">
+    <figcaption class="memory-caption">
+      <strong>Even after the moment is gone.</strong>
+      <span>The little memories become part of the people we carry with us.</span>
+    </figcaption>
+   </figure>
+  </div>
+
+  <div class="card-strip">
+   <div class="mini"><div class="icon">♡</div><h3>Your care</h3><p>It is one of the things I genuinely love about you — the way you care without needing a grand reason.</p></div>
+   <div class="mini"><div class="icon">⌂</div><h3>Your presence</h3><p>You don't have to do anything extraordinary. Being there is already something I value more than I probably say.</p></div>
+   <div class="mini"><div class="icon">✧</div><h3>Your place</h3><p>You never have to prove that you belong in my life. You already do. Completely.</p></div>
+  </div>
+
+  <div class="nav"><button data-prev>← Back</button><button data-next>Open something I wrote ✦</button></div>
+ </div>
+</section>
+
+<!-- PAGE 4 -->
+<section class="page letter-page" data-name="A Letter">
+ <div class="stars"></div>
+ <div class="letter-wrap">
+  <div class="chapter-no" style="text-align:center;color:#d9bd82">Chapter III · A Letter</div>
+  <div class="envelope">
+   <div class="seal">✦</div>
+   <div class="letter-title">For Praniksha · from your brother</div>
+   <div class="letter">
+    <p>Dear Praniksha,</p>
+    <p>I wanted to give you something you could keep. Not something that would disappear after one birthday, but something you could come back to whenever you wanted.</p>
+    <p>Because there are some people whose importance is almost impossible to explain. They don't arrive with a grand announcement. They simply become part of your everyday life until, one day, you realise that you cannot imagine the story without them.</p>
+    <p><strong>You are that person for me.</strong></p>
+    <p>You're my younger sister, yes. But you're more than just that word. Somewhere along the years, your presence became part of what feels familiar to me — part of the little things that make life feel like <em>home</em>.</p>
+    <p>It isn't only the way you care. It is the way you exist in my life: the conversations, the random moments, the laughter, the arguments, the stupid things we remember, and even the quiet moments where neither of us needs to say much.</p>
+    <p>Sometimes I don't realise how much I value the simple fact that <strong>you're there</strong> until I stop and think about it.</p>
+    <p>Tomorrow you turn <strong>20</strong>. And I hope this next chapter gives you beautiful places, good people, ridiculous amounts of laughter, courage when things get difficult, and the freedom to become whoever you want to be.</p>
+    <p>But if life ever becomes heavy, remember this: <strong>you never have to earn your place in my life.</strong> You already have it.</p>
+    <p>Thank you for being my sister. Thank you for the care you give. Thank you for every memory. And most of all, thank you for simply being <em>My Vaalu</em>.</p>
+    <p><strong>Some people are chapters in our lives. You're part of the story itself.</strong></p>
+   </div>
+   <div class="signature">Your brother, always.</div>
+  </div>
+  <div class="nav"><button data-prev>← Back</button><button data-next>Open the final page ✦</button></div>
+ </div>
+</section>
+
+<!-- PAGE 5 -->
+<section class="page final" data-name="Her Twentieth">
+ <div class="stars"></div>
+ <div class="final-content">
+  <div class="eyebrow">The Final Page · 20</div>
+  <div class="twenty">20</div>
+  <h2>Happy <span class="script" style="color:#e4c987">Birthday, Praniksha</span></h2>
+  <p>Twenty years of your story. And somehow, this feels less like an ending and more like the moment the book gets bigger.</p>
+  <div class="promise">
+   <p><strong>Your care matters.</strong> Your laughter matters. Your memories matter.<br>
+   But more than anything — <strong>your presence matters.</strong></p>
+   <p>You are loved, you are valued, and you have a permanent place in the story.</p>
+   <div class="script" style="font-size:42px;color:#e4c987;margin-top:20px">The story continues ✦</div>
+  </div>
+  <div class="nav"><button data-prev>← Read the letter again</button><button data-first>Begin again ↻</button></div>
+ </div>
+</section>
+
+</main>
+
+<script>
+const pages=[...document.querySelectorAll('.page')];
+const progress=document.querySelector('#progress i');
+const overlay=document.querySelector('#transition');
+const transSmall=document.querySelector('#transSmall');
+const transBig=document.querySelector('#transBig');
+let current=0;
+let busy=false;
+
+const labels=[
+ ["The Beginning","A story written in the stars"],
+ ["Chapter I","The years between"],
+ ["Chapter II","What she means"],
+ ["Chapter III","A letter from your brother"],
+ ["The final page","Her twentieth"]
+];
+
+function changePage(next){
+ if(busy || next<0 || next>=pages.length || next===current)return;
+ busy=true;
+ const direction=next>current?1:-1;
+ const old=pages[current], fresh=pages[next];
+
+ transSmall.textContent=labels[next][0];
+ transBig.textContent=labels[next][1];
+ overlay.classList.add('show');
+
+ setTimeout(()=>{
+   old.classList.remove('active');
+   old.classList.add('leave');
+   fresh.classList.remove('leave');
+   fresh.classList.add('active');
+   fresh.scrollTop=0;
+   current=next;
+   progress.style.width=((current+1)/pages.length*100)+'%';
+ },420);
+
+ setTimeout(()=>{
+   old.classList.remove('leave');
+   overlay.classList.remove('show');
+ },1050);
+
+ setTimeout(()=>busy=false,1250);
+}
+
+document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>changePage(current+1)));
+document.querySelectorAll('[data-prev]').forEach(b=>b.addEventListener('click',()=>changePage(current-1)));
+document.querySelector('[data-first]').addEventListener('click',()=>changePage(0));
+
+/* Keyboard chapter navigation */
+document.addEventListener('keydown',e=>{
+ if(e.key==='ArrowRight'||e.key==='ArrowDown')changePage(current+1);
+ if(e.key==='ArrowLeft'||e.key==='ArrowUp')changePage(current-1);
+});
+
+/* Continuous music — one audio element for the entire story */
+const audio=document.querySelector('#bg');
+const music=document.querySelector('#music');
+
+async function playMusic(){
+ if(!audio.paused)return;
+ try{
+   await audio.play();
+   music.classList.remove('muted');
+   music.title='Mute music';
+   music.setAttribute('aria-label','Mute music');
+ }catch(e){}
+}
+music.addEventListener('click',async()=>{
+ if(audio.paused) await playMusic();
+ else{
+   audio.pause();
+   music.classList.add('muted');
+   music.title='Unmute music';
+   music.setAttribute('aria-label','Unmute music');
+ }
+});
+document.addEventListener('pointerdown',playMusic,{once:true,passive:true});
+document.addEventListener('keydown',playMusic,{once:true});
+
+/* Ambient particles */
+for(let i=0;i<26;i++){
+ const s=document.createElement('span');
+ s.className='spark';
+ s.style.left=Math.random()*100+'%';
+ s.style.bottom=(-10-Math.random()*20)+'px';
+ s.style.animationDelay=(Math.random()*8)+'s';
+ s.style.animationDuration=(5+Math.random()*8)+'s';
+ document.body.appendChild(s);
+}
+progress.style.width=(100/pages.length)+'%';
+</script>
+</body>
+</html>
